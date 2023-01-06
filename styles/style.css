@@ -15,3 +15,8 @@ header {
 .loading {
     display: block;
 }
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+}

@@ -1,3 +1,95 @@
+const firebaseConfig = {
+    apiKey: "AIzaSyDMyExNJUwatSZkhEZjf7GLa5PENx0VsYg",
+    authDomain: "biblioteca-nytimes.firebaseapp.com",
+    projectId: "biblioteca-nytimes",
+    storageBucket: "biblioteca-nytimes.appspot.com",
+    messagingSenderId: "918383085779",
+    appId: "1:918383085779:web:1544878e69939fd1352c26"
+};
+
+firebase.initializeApp(firebaseConfig);//Inicializar app Firebase
+
+const db = firebase.firestore();//db representa mi BBDD //inicia Firestore
+const favoritesLists = db.collection("favoritesLists");
+
+//Registro de usuario
+const signUpUser = (email, password) => {
+    firebase
+        .auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            //Registrado
+            let user = userCredential.user;
+            alert(`se ha registrado ${user.email}`)
+            // Guarda El usuario en Firestore
+            favoritesLists.add({listName: `listOf${user.uid}`})
+                .then((docRef) => {
+                    console.log("Document written with ID: ", docRef.id)
+                    
+                })
+                .catch((error) => console.error("Error adding document: ", error));
+        })
+        .catch((error) => {
+            let errorCode = error.code;
+            let errorMessage = error.message;
+            console.log(errorCode);
+            console.log(errorMessage);
+        });
+};
+
+document.getElementById("form1").addEventListener("submit", function (event) {
+    event.preventDefault();
+    let email = event.target.elements.email.value;
+    let pass = event.target.elements.pass.value;
+    let pass2 = event.target.elements.pass2.value;
+    pass === pass2 ? signUpUser(email, pass) : alert("error: passwords didn't match");
+    document.getElementById("form1").reset();
+})
+
+//Login de usuario
+const signInUser = (email, password) => {
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            //Usuario logado
+            let user = userCredential.user;
+            alert(`se ha logado ${user.email}`)
+        })
+        .catch((error) => {
+            let errorCode = error.code;
+            let errorMessage = error.message;
+            console.log(errorCode);
+            console.log(errorMessage);
+        });
+}
+
+document.getElementById("form2").addEventListener("submit", function (event) {
+    event.preventDefault();
+    let email = event.target.elements.email2.value;
+    let pass = event.target.elements.pass3.value;
+    signInUser(email, pass);
+    document.getElementById("form2").reset();
+})
+
+//Cerrar sesión de usuario
+const signOut = () => {
+    let user = firebase.auth().currentUser;
+    firebase.auth().signOut().then(() => {
+        alert("Sale del sistema: " + user.email);
+    }).catch((error) => {
+        console.log("Hubo un error: " + error);
+    });
+}
+
+document.getElementById("logout").addEventListener("click", signOut);
+firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+        console.log(`Está en el sistema:${user.email}`);
+    } else {
+        console.log("No hay usuarios en el sistema");
+    }
+});
+
+//Funciones para enseñar y ocultar la animación de carga
 const loading = document.querySelector(".loading");
 
 function showLoading() {
@@ -28,6 +120,7 @@ async function getBooks(list) {
 
 const body = document.querySelector("body");
 const main = document.querySelector("#main");
+
 
 
 getLists()
