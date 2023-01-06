@@ -1,7 +1,17 @@
 body {
     font-family: 'Cabin', sans-serif;
+    background-color: #FBFBf8;
 }
 
 header {
     text-align: center;
+}
+
+.bookImg {
+    width: 190px;
+    height: 300px;
+}
+
+.loading {
+    display: block;
 }

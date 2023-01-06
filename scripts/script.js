@@ -1,4 +1,14 @@
-// API Key: eADVyEagry9TgVbcwAGiUGpLnoAJguAg
+const loading = document.querySelector(".loading");
+
+function showLoading() {
+    loading.style.display = "block";
+}
+
+function hideLoading() {
+    loading.style.display = "none";
+}
+
+
 
 //Función que obtiene las listas de la API del NYTimes
 async function getLists() {
@@ -13,8 +23,12 @@ async function getBooks(list) {
     return data
 }
 
-let body = document.querySelector("body");
-let main = document.querySelector("#main");
+
+
+
+const body = document.querySelector("body");
+const main = document.querySelector("#main");
+
 
 getLists()
     .then(data => {
@@ -44,9 +58,11 @@ getLists()
             //Evento del botón que oculta todas las listas y muestra los datos de la lista. Incluye un botón que oculta la lista y vuelve a mostrarlas todas
             (function (listName) {
                 readMore.addEventListener("click", function () {
+                    window.scrollTo(0, 0);
                     getBooks(listName)
                         .then(data => {
                             main.style.display = "none";
+                            showLoading();
                             let mainList = document.createElement("main");
                             body.appendChild(mainList)
                             let listTitle = document.createElement("p");
@@ -87,10 +103,12 @@ getLists()
                                 })(book);
                                 divBook.appendChild(amazonLink);
                             }
+                            hideLoading();
                         })
                         .catch(error => console.log("Hubo un error: " + error));
                 });
             })(list.list_name_encoded);
+            hideLoading();
         }
     })
     .catch(error => console.log("Hubo un error: " + error));
