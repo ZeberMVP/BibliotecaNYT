@@ -21,13 +21,8 @@ const signUpUser = (email, password) => {
             //Registrado
             let user = userCredential.user;
             alert(`se ha registrado ${user.email}`)
-            // Guarda El usuario en Firestore
-            favoritesLists.add({listName: `listOf${user.uid}`})
-                .then((docRef) => {
-                    console.log("Document written with ID: ", docRef.id)
-                    
-                })
-                .catch((error) => console.error("Error adding document: ", error));
+            favoritesLists.doc(user.uid).set({})
+
         })
         .catch((error) => {
             let errorCode = error.code;
@@ -115,6 +110,31 @@ async function getBooks(list) {
     return data
 }
 
+//Función para añadir a favoritos o eliminar de favoritos
+
+function toggleFavorites(bookId) {
+    let userId = firebase.auth().currentUser.uid;
+    favoritesLists.doc(userId).get().then((doc) => {
+        let favorites = doc.data() || {};
+        if (favorites[bookId]) {
+            // El libro ya está en la lista, eliminar
+            favoritesLists.doc(userId).update({ [bookId]: firebase.firestore.FieldValue.delete() });
+        } else {
+            // El libro no está en la lista, añadir
+            favoritesLists.doc(userId).update({ [bookId]: true });
+        }
+    });
+}
+
+const getFavorites = async () => {
+    let userId = firebase.auth().currentUser.uid;
+    const doc = await favoritesLists.doc(userId).get();
+    let favorites = doc.data();
+    return favorites;
+}
+
+
+
 
 
 
@@ -131,7 +151,7 @@ getLists()
             main.appendChild(divList);
             let listTitle = document.createElement("p");
             listTitle.setAttribute("class", "listTitle");
-            listTitle.innerHTML = list.display_name;
+            listTitle.innerHTML = `<h3>${list.display_name}</h3>`;
             divList.appendChild(listTitle);
             let oldest = document.createElement("p");
             oldest.setAttribute("class", "listData");
@@ -188,13 +208,35 @@ getLists()
                                 divBook.appendChild(bookDescription);
                                 let amazonLink = document.createElement("button");
                                 amazonLink.innerHTML = "BUY AT AMAZON";
-
+                                divBook.appendChild(amazonLink);
+                                let favoritesButton = document.createElement("button");
+                                divBook.appendChild(favoritesButton);
                                 (function (actualBook) {
+                                    getFavorites().then((favorites) => {
+                                        if (favorites[actualBook.title]) {
+                                            favoritesButton.innerHTML = "DELETE FROM FAVORITES"
+                                        } else {
+                                            favoritesButton.innerHTML = "ADD TO FAVORITES"
+                                        }
+                                    });
                                     amazonLink.addEventListener("click", function () {
                                         window.open(actualBook.buy_links[0].url);
                                     });
+                                    favoritesButton.addEventListener("click", function () {
+                                        toggleFavorites(actualBook.title);
+
+                                        if (favoritesButton.innerHTML === "ADD TO FAVORITES") {
+                                            favoritesButton.innerHTML = "DELETE FROM FAVORITES"
+                                        } else {
+                                            favoritesButton.innerHTML = "ADD TO FAVORITES"
+                                        }
+
+                                    });
                                 })(book);
-                                divBook.appendChild(amazonLink);
+
+
+
+
                             }
                             hideLoading();
                         })
