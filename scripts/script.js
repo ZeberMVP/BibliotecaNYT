@@ -50,6 +50,7 @@ const signInUser = (email, password) => {
             alert(`se ha logado ${user.email}`)
         })
         .catch((error) => {
+            alert("Usuario incorrecto. Si no se ha registrado, debe hacerlo primero");
             let errorCode = error.code;
             let errorMessage = error.message;
             console.log(errorCode);
@@ -126,6 +127,7 @@ function toggleFavorites(bookId) {
     });
 }
 
+//Función asíncrona que obtiene la lista de favoritos del usuario
 const getFavorites = async () => {
     let userId = firebase.auth().currentUser.uid;
     const doc = await favoritesLists.doc(userId).get();
@@ -168,8 +170,8 @@ getLists()
             let readMore = document.createElement("button");
             readMore.innerHTML = "READ MORE!";
             divList.appendChild(readMore);
-            //Evento del botón que oculta todas las listas y muestra los datos de la lista. Incluye un botón que oculta la lista y vuelve a mostrarlas todas
-            (function (listName) {
+            //Evento del botón que oculta todas las listas y muestra los datos de la lista. Incluye un botón que oculta la lista y vuelve a mostrarlas todas. También incluye un botón para añadir el libro a la lista de favoritos
+            (function (listName) { //Función IIFE que aplica a todas las listas en lugar de solo la última
                 readMore.addEventListener("click", function () {
                     window.scrollTo(0, 0);
                     getBooks(listName)
@@ -211,32 +213,35 @@ getLists()
                                 divBook.appendChild(amazonLink);
                                 let favoritesButton = document.createElement("button");
                                 divBook.appendChild(favoritesButton);
-                                (function (actualBook) {
-                                    getFavorites().then((favorites) => {
-                                        if (favorites[actualBook.title]) {
-                                            favoritesButton.innerHTML = "DELETE FROM FAVORITES"
-                                        } else {
-                                            favoritesButton.innerHTML = "ADD TO FAVORITES"
-                                        }
-                                    });
+                                favoritesButton.innerHTML = "ADD TO FAVORITES";
+                                (function (actualBook) { //Función IIFE que aplica a todos los libros en lugar de solo el último
                                     amazonLink.addEventListener("click", function () {
                                         window.open(actualBook.buy_links[0].url);
                                     });
-                                    favoritesButton.addEventListener("click", function () {
-                                        toggleFavorites(actualBook.title);
-
-                                        if (favoritesButton.innerHTML === "ADD TO FAVORITES") {
-                                            favoritesButton.innerHTML = "DELETE FROM FAVORITES"
+                                    firebase.auth().onAuthStateChanged(function (user) { //Verifica si el usuario ha iniciado sesión
+                                        if (!user) {
+                                            favoritesButton.addEventListener("click", function () {
+                                                alert("You should login before adding books to your favorites list");
+                                            });
                                         } else {
-                                            favoritesButton.innerHTML = "ADD TO FAVORITES"
+                                            getFavorites().then((favorites) => { //El botón de favoritos cambiará su texto en función de si el libro se encuentra en la lista de favoritos o no
+                                                if (favorites[actualBook.title]) {
+                                                    favoritesButton.innerHTML = "DELETE FROM FAVORITES";
+                                                } else {
+                                                    favoritesButton.innerHTML = "ADD TO FAVORITES";
+                                                };
+                                                favoritesButton.addEventListener("click", function () {
+                                                    toggleFavorites(actualBook.title);
+                                                    if (favoritesButton.innerHTML === "ADD TO FAVORITES") {
+                                                        favoritesButton.innerHTML = "DELETE FROM FAVORITES";
+                                                    } else {
+                                                        favoritesButton.innerHTML = "ADD TO FAVORITES";
+                                                    }
+                                                });
+                                            });
                                         }
-
                                     });
                                 })(book);
-
-
-
-
                             }
                             hideLoading();
                         })
