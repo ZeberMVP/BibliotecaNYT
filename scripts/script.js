@@ -86,6 +86,37 @@ firebase.auth().onAuthStateChanged(function (user) {
     }
 });
 
+//Funcion para subir foto de perfil
+function uploadFile() {
+    let storageRef = firebase.storage().ref();
+    let file = document.getElementById("files").files[0];
+    let thisRef = storageRef.child(file.name);
+    let profilePic = document.querySelector("#profilePic");
+    thisRef.getMetadata().then(function (metadata) {
+        thisRef.delete().then(function () {
+            thisRef.put(file).then(function (snapshot) {
+                snapshot.ref.getDownloadURL().then(function (url) {
+                    profilePic.setAttribute("src", url);
+                    profilePic.style.display = "block";
+                });
+            }).catch(function (error) {
+                console.log(error);
+            });
+        }).catch(function (error) {
+            if (error.code === 'storage/object-not-found') {
+                thisRef.put(file).then(function (snapshot) {
+                    snapshot.ref.getDownloadURL().then(function (url) {
+                        profilePic.setAttribute("src", url);
+                        profilePic.style.display = "block";
+                    });
+                })
+            } else {
+                console.log(error);
+            }
+        });
+    })
+}
+
 //Funciones para enseñar y ocultar la animación de carga
 const loading = document.querySelector(".loading");
 
@@ -177,35 +208,35 @@ firebase.auth().onAuthStateChanged(function (user) { //Verifica si el usuario ha
                         .then(data => {
                             for (title of titles) {
                                 for (book of data.results.books)
-                                if (title === book.title) {
-                                    let divBook = document.createElement("div");
-                                    mainFavoritesList.appendChild(divBook);
-                                    let bookTitle = document.createElement("p");
-                                    bookTitle.innerHTML = `<h4>${book.title}</h4>`;
-                                    divBook.appendChild(bookTitle);
-                                    let bookImg = document.createElement("img");
-                                    bookImg.setAttribute("src", book.book_image);
-                                    bookImg.setAttribute("class", "bookImg");
-                                    divBook.appendChild(bookImg);
-                                    let bookDescription = document.createElement("p");
-                                    bookDescription.innerHTML = book.description;
-                                    divBook.appendChild(bookDescription);
-                                    let amazonLink = document.createElement("button");
-                                    amazonLink.innerHTML = "BUY AT AMAZON";
-                                    divBook.appendChild(amazonLink);
-                                    let favoritesButton = document.createElement("button");
-                                    divBook.appendChild(favoritesButton);
-                                    favoritesButton.innerHTML = "DELETE FROM FAVORITES";
-                                    (function (actualBook, actualList) { //Función IIFE que aplica a todos los libros en lugar de solo el último
-                                        amazonLink.addEventListener("click", function () {
-                                            window.open(actualBook.buy_links[0].url);
-                                        });
-                                        favoritesButton.addEventListener("click", function () {
-                                            toggleFavorites(actualBook.title, actualList);
-                                            divBook.style.display = "none";
-                                        });
-                                    })(book, list);
-                                } 
+                                    if (title === book.title) {
+                                        let divBook = document.createElement("div");
+                                        mainFavoritesList.appendChild(divBook);
+                                        let bookTitle = document.createElement("p");
+                                        bookTitle.innerHTML = `<h4>${book.title}</h4>`;
+                                        divBook.appendChild(bookTitle);
+                                        let bookImg = document.createElement("img");
+                                        bookImg.setAttribute("src", book.book_image);
+                                        bookImg.setAttribute("class", "bookImg");
+                                        divBook.appendChild(bookImg);
+                                        let bookDescription = document.createElement("p");
+                                        bookDescription.innerHTML = book.description;
+                                        divBook.appendChild(bookDescription);
+                                        let amazonLink = document.createElement("button");
+                                        amazonLink.innerHTML = "BUY AT AMAZON";
+                                        divBook.appendChild(amazonLink);
+                                        let favoritesButton = document.createElement("button");
+                                        divBook.appendChild(favoritesButton);
+                                        favoritesButton.innerHTML = "DELETE FROM FAVORITES";
+                                        (function (actualBook, actualList) { //Función IIFE que aplica a todos los libros en lugar de solo el último
+                                            amazonLink.addEventListener("click", function () {
+                                                window.open(actualBook.buy_links[0].url);
+                                            });
+                                            favoritesButton.addEventListener("click", function () {
+                                                toggleFavorites(actualBook.title, actualList);
+                                                divBook.style.display = "none";
+                                            });
+                                        })(book, list);
+                                    }
                             }
                         })
                 }

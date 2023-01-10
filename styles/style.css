@@ -12,6 +12,12 @@ header {
     height: 300px;
 }
 
+#profilePic {
+    display: none;
+    width: 200px;
+    height: 200px
+}
+
 .loading {
     display: block;
 }

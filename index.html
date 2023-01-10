@@ -39,6 +39,13 @@
         </form>
         <button id="logout">Logout</button>
         <button id="favoritesList">Favorites list</button>
+        <div>
+            <p>Profile Picture</p>
+            <input type="file" onchange="uploadFile()" id="files" name="files[]" multiple />
+            <img src="" alt="" id="profilePic">
+        </div>
+        
+        
     </nav>
     <div class="loading">
         <img src="./assets/loading.gif" alt="Loading animation">
@@ -49,6 +56,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-storage.js"></script>
     <script src="./scripts/script.js"></script>
 </body>
 
