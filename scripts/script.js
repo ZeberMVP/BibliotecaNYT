@@ -20,8 +20,8 @@ const signUpUser = (email, password) => {
         .then((userCredential) => {
             //Registrado
             let user = userCredential.user;
-            alert(`se ha registrado ${user.email}`)
-            favoritesLists.doc(user.uid).set({})
+            alert(`signed up: ${user.email}`)
+            favoritesLists.doc(user.uid).set({ favorites: [] })
 
         })
         .catch((error) => {
@@ -29,6 +29,7 @@ const signUpUser = (email, password) => {
             let errorMessage = error.message;
             console.log(errorCode);
             console.log(errorMessage);
+            alert(errorMessage);
         });
 };
 
@@ -47,7 +48,7 @@ const signInUser = (email, password) => {
         .then((userCredential) => {
             //Usuario logado
             let user = userCredential.user;
-            alert(`se ha logado ${user.email}`)
+            alert(`log in: ${user.email}`)
         })
         .catch((error) => {
             alert("Usuario incorrecto. Si no se ha registrado, debe hacerlo primero");
@@ -70,7 +71,7 @@ document.getElementById("form2").addEventListener("submit", function (event) {
 const signOut = () => {
     let user = firebase.auth().currentUser;
     firebase.auth().signOut().then(() => {
-        alert("Sale del sistema: " + user.email);
+        alert("Log out: " + user.email);
     }).catch((error) => {
         console.log("Hubo un error: " + error);
     });
@@ -96,8 +97,6 @@ function hideLoading() {
     loading.style.display = "none";
 }
 
-
-
 //Función que obtiene las listas de la API del NYTimes
 async function getLists() {
     let res = await fetch("https://api.nytimes.com/svc/books/v3/lists/names.json?api-key=eADVyEagry9TgVbcwAGiUGpLnoAJguAg");
@@ -113,17 +112,16 @@ async function getBooks(list) {
 
 //Función para añadir a favoritos o eliminar de favoritos
 
-function toggleFavorites(bookId) {
+function toggleFavorites(bookId, list) {
     let userId = firebase.auth().currentUser.uid;
     favoritesLists.doc(userId).get().then((doc) => {
-        let favorites = doc.data() || {};
-        if (favorites[bookId]) {
-            // El libro ya está en la lista, eliminar
-            favoritesLists.doc(userId).update({ [bookId]: firebase.firestore.FieldValue.delete() });
-        } else {
-            // El libro no está en la lista, añadir
-            favoritesLists.doc(userId).update({ [bookId]: true });
+        let favoritesDoc = doc.data();
+        let newFavorites = favoritesDoc.favorites.filter(book => book.title !== bookId);
+        if (favoritesDoc.favorites.length === newFavorites.length) {
+            //El libro no se encuentra en la lista, añadelo
+            newFavorites.push({ title: bookId, "list": list });
         }
+        favoritesLists.doc(userId).update({ favorites: newFavorites });
     });
 }
 
@@ -136,14 +134,85 @@ const getFavorites = async () => {
 }
 
 
-
-
-
-
 const body = document.querySelector("body");
 const main = document.querySelector("#main");
+const favoritesList = document.querySelector("#favoritesList");
 
-
+//Establece la lista de favoritos del usuario
+firebase.auth().onAuthStateChanged(function (user) { //Verifica si el usuario ha iniciado sesión
+    if (!user) {
+        favoritesList.addEventListener("click", function () {
+            alert("You should log up before watching your favorites list");
+        });
+    } else {
+        favoritesList.addEventListener("click", function () {
+            main.style.display = "none";
+            let mainFavoritesList = document.createElement("main");
+            body.appendChild(mainFavoritesList)
+            let favoritesTitle = document.createElement("p");
+            favoritesTitle.innerHTML = "Favorites list";
+            mainFavoritesList.appendChild(favoritesTitle);
+            let backToIndex = document.createElement("button");
+            backToIndex.innerHTML = "BACK TO INDEX";
+            mainFavoritesList.appendChild(backToIndex);
+            backToIndex.addEventListener("click", function () {
+                mainFavoritesList.style.display = "none";
+                main.style.display = "block";
+            });
+            getFavorites().then((favoritesDoc) => {
+                let lists = favoritesDoc.favorites.reduce((acc, { list }) => {
+                    if (!acc.find(elem => elem === list)) {
+                        acc.push(list);
+                    }
+                    return acc;
+                }, []);
+                let titles = favoritesDoc.favorites.reduce((acc, { title }) => {
+                    if (!acc.find(elem => elem === title)) {
+                        acc.push(title);
+                    }
+                    return acc;
+                }, []);
+                for (list of lists) {
+                    getBooks(list)
+                        .then(data => {
+                            for (title of titles) {
+                                for (book of data.results.books)
+                                if (title === book.title) {
+                                    let divBook = document.createElement("div");
+                                    mainFavoritesList.appendChild(divBook);
+                                    let bookTitle = document.createElement("p");
+                                    bookTitle.innerHTML = `<h4>${book.title}</h4>`;
+                                    divBook.appendChild(bookTitle);
+                                    let bookImg = document.createElement("img");
+                                    bookImg.setAttribute("src", book.book_image);
+                                    bookImg.setAttribute("class", "bookImg");
+                                    divBook.appendChild(bookImg);
+                                    let bookDescription = document.createElement("p");
+                                    bookDescription.innerHTML = book.description;
+                                    divBook.appendChild(bookDescription);
+                                    let amazonLink = document.createElement("button");
+                                    amazonLink.innerHTML = "BUY AT AMAZON";
+                                    divBook.appendChild(amazonLink);
+                                    let favoritesButton = document.createElement("button");
+                                    divBook.appendChild(favoritesButton);
+                                    favoritesButton.innerHTML = "DELETE FROM FAVORITES";
+                                    (function (actualBook, actualList) { //Función IIFE que aplica a todos los libros en lugar de solo el último
+                                        amazonLink.addEventListener("click", function () {
+                                            window.open(actualBook.buy_links[0].url);
+                                        });
+                                        favoritesButton.addEventListener("click", function () {
+                                            toggleFavorites(actualBook.title, actualList);
+                                            divBook.style.display = "none";
+                                        });
+                                    })(book, list);
+                                } 
+                            }
+                        })
+                }
+            });
+        });
+    }
+})
 
 getLists()
     .then(data => {
@@ -224,14 +293,14 @@ getLists()
                                                 alert("You should login before adding books to your favorites list");
                                             });
                                         } else {
-                                            getFavorites().then((favorites) => { //El botón de favoritos cambiará su texto en función de si el libro se encuentra en la lista de favoritos o no
-                                                if (favorites[actualBook.title]) {
+                                            getFavorites().then((favoritesDoc) => { //El botón de favoritos cambiará su texto en función de si el libro se encuentra en la lista de favoritos o no
+                                                if (favoritesDoc.favorites.some(elem => elem.title === actualBook.title)) {
                                                     favoritesButton.innerHTML = "DELETE FROM FAVORITES";
                                                 } else {
                                                     favoritesButton.innerHTML = "ADD TO FAVORITES";
                                                 };
                                                 favoritesButton.addEventListener("click", function () {
-                                                    toggleFavorites(actualBook.title);
+                                                    toggleFavorites(actualBook.title, data.results.list_name_encoded);
                                                     if (favoritesButton.innerHTML === "ADD TO FAVORITES") {
                                                         favoritesButton.innerHTML = "DELETE FROM FAVORITES";
                                                     } else {
