@@ -91,29 +91,15 @@ function uploadFile() {
     let file = document.getElementById("files").files[0];
     let thisRef = storageRef.child(file.name);
     let profilePic = document.querySelector("#profilePic");
-    thisRef.getMetadata().then(function (metadata) {
-        thisRef.delete().then(function () {
-            thisRef.put(file).then(function (snapshot) {
-                snapshot.ref.getDownloadURL().then(function (url) {
-                    profilePic.setAttribute("src", url);
-                    profilePic.style.display = "block";
-                });
-            }).catch(function (error) {
-                console.log(error);
-            });
-        }).catch(function (error) {
-            if (error.code === 'storage/object-not-found') {
-                thisRef.put(file).then(function (snapshot) {
-                    snapshot.ref.getDownloadURL().then(function (url) {
-                        profilePic.setAttribute("src", url);
-                        profilePic.style.display = "block";
-                    });
-                })
-            } else {
-                console.log(error);
-            }
+
+    thisRef.put(file).then(function (snapshot) {
+        snapshot.ref.getDownloadURL().then(function (url) {
+            profilePic.setAttribute("src", url);
+            profilePic.style.display = "block";
         });
-    })
+    }).catch(function (error) {
+        console.log(error);
+    });
 }
 
 //Funciones para enseñar y ocultar la animación de carga
