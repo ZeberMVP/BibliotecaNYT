@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca NYTimes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/style.css">
+</head>
+
+<body>
+    <header>
+        <img src="./assets/NY-Times-best-seller.png" alt="Logo de Best Sellers del New York Times" class="brand">
+    </header>
+    <nav>
+        <div class="nav-element">
+            <h3 class="inside-nav">Register</h3>
+            <form id="form1" action="#" method="POST" class="inside-nav">
+            <input type="email" id="email" name="email" placeholder="Introduce your email..." class="inside-nav"><br>
+            <input type="password" id="pass" name="pass" placeholder="Introduce your password..." class="inside-nav"><br>
+            <input type="password" id="pass2" name="pass2" placeholder="Repeat your password..." class="inside-nav"><br><br>
+            <input type="submit" value="Submit" class="inside-nav">
+            </form>
+        </div>
+        
+        <div class="nav-element">
+            <h3 class="inside-nav">Login</h3>
+            <form id="form2" action="#" method="POST" class="inside-nav">
+            <input type="email" id="email2" name="email2" placeholder="Introduce your email..." class="inside-nav"><br>
+            <input type="password" id="pass3" name="pass3" placeholder="Introduce your password..." class="inside-nav"><br>
+            <input type="submit" value="Submit" class="inside-nav">
+        </form>
+        <button id="logout" class="inside-nav">Logout</button> 
+        <button id="favoritesList" class="inside-nav">Favorites list</button>
+        </div>
+        
+        <div class="nav-element">
+            <p class="inside-nav">Profile Picture (200x200)</p>
+            <input type="file" onchange="uploadFile()" id="files" name="files[]" class="inside-nav"/>
+            <img src="" alt="" id="profilePic">
+        </div>
+        
+        
+    </nav>
+    <div class="loading">
+        <img src="./assets/loading.gif" alt="Loading animation">
+    </div>
+    <main id="main"></main>
+    <main id="mainList"></main>
+    <main id="mainFavoritesList"></main>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-storage.js"></script>
+    <script src="./scripts/script.js"></script>
+</body>
+
+</html>
