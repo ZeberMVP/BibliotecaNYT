@@ -1,10 +1,60 @@
 body {
     font-family: 'Cabin', sans-serif;
-    background-color: #FBFBf8;
 }
 
 header {
     text-align: center;
+}
+
+#main,
+nav {
+    display: flex;
+}
+
+main,
+nav {
+    flex-flow: row wrap;
+    align-items: center;
+    text-align: center;
+}
+
+h3 {
+    height: 30px;
+}
+
+#mainList,
+#mainFavoritesList {
+    display: none;
+}
+
+.nav-element {
+    width: 100%;
+}
+
+.inside-nav {
+    margin: 1% 0;
+}
+
+.divList,
+.divBook,
+.sectionTitle,
+.backToIndex {
+    margin: 2% auto;
+    padding: 3%;
+    width: 40%;
+}
+
+.backToIndex {
+    font-size: 1.5em;
+    border-radius: 100px;
+    padding: 0.2rem 0.3rem;
+}
+
+.divList,
+.bookImg {
+    width: 40%;
+    border: 1px dashed black;
+    border-radius: 10px;
 }
 
 .bookImg {
@@ -12,10 +62,19 @@ header {
     height: 300px;
 }
 
+.bookDescription {
+    height: 100px;
+}
+
+p.sectionTitle {
+    font-size: 2em;
+}
+
 #profilePic {
     display: none;
     width: 200px;
-    height: 200px
+    height: 200px;
+    margin: 0 auto;
 }
 
 .loading {
@@ -25,4 +84,81 @@ header {
 nav {
     display: flex;
     flex-wrap: wrap;
+}
+
+button,
+input[type="submit"] {
+    align-items: center;
+    background-clip: padding-box;
+    background-color: #9e1f22;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.8em;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 1.25;
+    margin: 0;
+    min-height: 3rem;
+    padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+    position: relative;
+    text-decoration: none;
+    transition: all 250ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: baseline;
+    width: auto;
+}
+
+button:hover,
+button:focus,
+input[type="submit"]:hover,
+input[type="submit"]:focus {
+    background-color: #c64648;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+button:hover,
+input[type="submit"]:hover {
+    transform: translateY(-1px);
+}
+
+button:active,
+input[type="submit"]:active {
+    background-color: #741112;
+    box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+    transform: translateY(0);
+}
+
+@media screen and (min-width: 800px) {
+
+    .nav-element {
+        width: 33%;
+    }
+
+    .divList,
+    .divBook {
+        margin: 1% auto;
+        padding: 3%;
+        width: 25%;
+    }
+
+}
+
+@media screen and (min-width: 1260px) {
+
+    .divList,
+    .divBook {
+        margin: 2% auto;
+        padding: 3%;
+        width: 18%;
+    }
+
+
 }

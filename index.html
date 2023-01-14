@@ -19,29 +19,30 @@
         <img src="./assets/NY-Times-best-seller.png" alt="Logo de Best Sellers del New York Times" class="brand">
     </header>
     <nav>
-        <h4>Register</h4>
-        <form id="form1" action="#" method="POST">
-            <label for="email">Email:</label><br>
-            <input type="email" id="email" name="email" placeholder="Introduce your email..."><br>
-            <label for="pass">Password:</label><br>
-            <input type="password" id="pass" name="pass" placeholder="Introduce your password..."><br>
-            <label for="pass2">Repeat password:</label><br>
-            <input type="password" id="pass2" name="pass2" placeholder="Repeat your password..."><br><br>
-            <input type="submit" value="Submit">
+        <div class="nav-element">
+            <h3 class="inside-nav">Register</h3>
+            <form id="form1" action="#" method="POST" class="inside-nav">
+            <input type="email" id="email" name="email" placeholder="Introduce your email..." class="inside-nav"><br>
+            <input type="password" id="pass" name="pass" placeholder="Introduce your password..." class="inside-nav"><br>
+            <input type="password" id="pass2" name="pass2" placeholder="Repeat your password..." class="inside-nav"><br><br>
+            <input type="submit" value="Submit" class="inside-nav">
+            </form>
+        </div>
+        
+        <div class="nav-element">
+            <h3 class="inside-nav">Login</h3>
+            <form id="form2" action="#" method="POST" class="inside-nav">
+            <input type="email" id="email2" name="email2" placeholder="Introduce your email..." class="inside-nav"><br>
+            <input type="password" id="pass3" name="pass3" placeholder="Introduce your password..." class="inside-nav"><br>
+            <input type="submit" value="Submit" class="inside-nav">
         </form>
-        <h4>Login</h4>
-        <form id="form2" action="#" method="POST">
-            <label for="email2">Email:</label><br>
-            <input type="email" id="email2" name="email2" placeholder="Introduce your email..."><br>
-            <label for="pass3">Password:</label><br>
-            <input type="password" id="pass3" name="pass3" placeholder="Introduce your password..."><br>
-            <input type="submit" value="Submit">
-        </form>
-        <button id="logout">Logout</button>
-        <button id="favoritesList">Favorites list</button>
-        <div>
-            <p>Profile Picture</p>
-            <input type="file" onchange="uploadFile()" id="files" name="files[]" multiple />
+        <button id="logout" class="inside-nav">Logout</button> 
+        <button id="favoritesList" class="inside-nav">Favorites list</button>
+        </div>
+        
+        <div class="nav-element">
+            <p class="inside-nav">Profile Picture (200x200)</p>
+            <input type="file" onchange="uploadFile()" id="files" name="files[]" class="inside-nav"/>
             <img src="" alt="" id="profilePic">
         </div>
         
@@ -50,9 +51,9 @@
     <div class="loading">
         <img src="./assets/loading.gif" alt="Loading animation">
     </div>
-    <main id="main">
-
-    </main>
+    <main id="main"></main>
+    <main id="mainList"></main>
+    <main id="mainFavoritesList"></main>
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>

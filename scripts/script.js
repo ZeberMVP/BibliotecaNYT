@@ -22,7 +22,6 @@ const signUpUser = (email, password) => {
             let user = userCredential.user;
             alert(`signed up: ${user.email}`)
             favoritesLists.doc(user.uid).set({ favorites: [] })
-
         })
         .catch((error) => {
             let errorCode = error.code;
@@ -168,6 +167,7 @@ const getFavorites = async () => {
 const body = document.querySelector("body");
 const main = document.querySelector("#main");
 const favoritesList = document.querySelector("#favoritesList");
+const mainList = document.querySelector("#mainList");
 
 //Establece la lista de favoritos del usuario
 firebase.auth().onAuthStateChanged(function (user) { //Verifica si el usuario ha iniciado sesión
@@ -178,17 +178,21 @@ firebase.auth().onAuthStateChanged(function (user) { //Verifica si el usuario ha
     } else {
         favoritesList.addEventListener("click", function () {
             main.style.display = "none";
-            let mainFavoritesList = document.createElement("main");
-            body.appendChild(mainFavoritesList)
+            mainList.style.display = "none";
+            let mainFavoritesList = document.querySelector("#mainFavoritesList");
+            mainFavoritesList.innerHTML = "";
+            mainFavoritesList.style.display = "flex"
             let favoritesTitle = document.createElement("p");
             favoritesTitle.innerHTML = "Favorites list";
+            favoritesTitle.setAttribute("class", "sectionTitle");
             mainFavoritesList.appendChild(favoritesTitle);
             let backToIndex = document.createElement("button");
             backToIndex.innerHTML = "BACK TO INDEX";
+            backToIndex.setAttribute("class", "backToIndex");
             mainFavoritesList.appendChild(backToIndex);
             backToIndex.addEventListener("click", function () {
                 mainFavoritesList.style.display = "none";
-                main.style.display = "block";
+                main.style.display = "flex";
             });
             getFavorites().then((favoritesDoc) => {
                 let lists = favoritesDoc.favorites.reduce((acc, { list }) => {
@@ -210,6 +214,7 @@ firebase.auth().onAuthStateChanged(function (user) { //Verifica si el usuario ha
                                 for (book of data.results.books)
                                     if (title === book.title) {
                                         let divBook = document.createElement("div");
+                                        divBook.setAttribute("class", "divBook")
                                         mainFavoritesList.appendChild(divBook);
                                         let bookTitle = document.createElement("p");
                                         bookTitle.innerHTML = `<h4>${book.title}</h4>`;
@@ -221,6 +226,7 @@ firebase.auth().onAuthStateChanged(function (user) { //Verifica si el usuario ha
                                         let bookDescription = document.createElement("p");
                                         bookDescription.innerHTML = book.description;
                                         divBook.appendChild(bookDescription);
+                                        bookDescription.setAttribute("class", "bookDescription");
                                         let amazonLink = document.createElement("button");
                                         amazonLink.innerHTML = "BUY AT AMAZON";
                                         divBook.appendChild(amazonLink);
@@ -250,9 +256,9 @@ getLists()
         for (list of data.results) {
             //Crea un div por cada lista que contiene el título, primera y última publicación y la frecuencia de actualización, además de un botón que ofrece más información sobre la lista
             let divList = document.createElement("div");
+            divList.setAttribute("class", "divList");
             main.appendChild(divList);
             let listTitle = document.createElement("p");
-            listTitle.setAttribute("class", "listTitle");
             listTitle.innerHTML = `<h3>${list.display_name}</h3>`;
             divList.appendChild(listTitle);
             let oldest = document.createElement("p");
@@ -277,21 +283,24 @@ getLists()
                     getBooks(listName)
                         .then(data => {
                             main.style.display = "none";
+                            mainList.innerHTML = "";
                             showLoading();
-                            let mainList = document.createElement("main");
-                            body.appendChild(mainList)
+                            mainList.style.display = "flex";
                             let listTitle = document.createElement("p");
                             listTitle.innerHTML = data.results.display_name;
+                            listTitle.setAttribute("class", "sectionTitle");
                             mainList.appendChild(listTitle);
                             let backToIndex = document.createElement("button");
+                            backToIndex.setAttribute("class", "backToIndex");
                             backToIndex.innerHTML = "BACK TO INDEX";
                             mainList.appendChild(backToIndex);
                             backToIndex.addEventListener("click", function () {
                                 mainList.style.display = "none";
-                                main.style.display = "block";
+                                main.style.display = "flex";
                             });
                             for (book of data.results.books) {
                                 let divBook = document.createElement("div");
+                                divBook.setAttribute("class", "divBook");
                                 mainList.appendChild(divBook);
                                 let bookTitle = document.createElement("p");
                                 bookTitle.innerHTML = `<h4>#${book.rank} ${book.title}</h4>`;
@@ -306,6 +315,7 @@ getLists()
                                     divBook.appendChild(weeksOnList);
                                 }
                                 let bookDescription = document.createElement("p");
+                                bookDescription.setAttribute("class", "bookDescription");
                                 bookDescription.innerHTML = book.description;
                                 divBook.appendChild(bookDescription);
                                 let amazonLink = document.createElement("button");
@@ -313,7 +323,7 @@ getLists()
                                 divBook.appendChild(amazonLink);
                                 let favoritesButton = document.createElement("button");
                                 divBook.appendChild(favoritesButton);
-                                favoritesButton.innerHTML = "ADD TO FAVORITES";
+                                favoritesButton.innerHTML = "FAVORITES";
                                 (function (actualBook) { //Función IIFE que aplica a todos los libros en lugar de solo el último
                                     amazonLink.addEventListener("click", function () {
                                         window.open(actualBook.buy_links[0].url);
@@ -326,16 +336,16 @@ getLists()
                                         } else {
                                             getFavorites().then((favoritesDoc) => { //El botón de favoritos cambiará su texto en función de si el libro se encuentra en la lista de favoritos o no
                                                 if (favoritesDoc.favorites.some(elem => elem.title === actualBook.title)) {
-                                                    favoritesButton.innerHTML = "DELETE FROM FAVORITES";
+                                                    favoritesButton.innerHTML = "DELETE";
                                                 } else {
-                                                    favoritesButton.innerHTML = "ADD TO FAVORITES";
+                                                    favoritesButton.innerHTML = "FAVORITES";
                                                 };
                                                 favoritesButton.addEventListener("click", function () {
                                                     toggleFavorites(actualBook.title, data.results.list_name_encoded);
-                                                    if (favoritesButton.innerHTML === "ADD TO FAVORITES") {
-                                                        favoritesButton.innerHTML = "DELETE FROM FAVORITES";
+                                                    if (favoritesButton.innerHTML === "FAVORITES") {
+                                                        favoritesButton.innerHTML = "DELETE";
                                                     } else {
-                                                        favoritesButton.innerHTML = "ADD TO FAVORITES";
+                                                        favoritesButton.innerHTML = "FAVORITES";
                                                     }
                                                 });
                                             });
